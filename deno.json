@@ -1,10 +1,10 @@
 {
   "nodeModulesDir": "auto",
   "tasks": {
-    "check": "deno fmt --check . && deno lint . && deno check",
-    "dev": "deno run -A --watch=static/,routes/ dev.ts",
-    "build": "deno run -A dev.ts build",
-    "start": "deno serve -A _fresh/server.js",
+    "check": "deno fmt --check . && deno lint . && deno check --unstable-kv",
+    "dev": "deno run -A --unstable-kv --watch=static/,routes/ dev.ts",
+    "build": "deno run -A --unstable-kv dev.ts build",
+    "start": "deno serve -A --unstable-kv _fresh/server.js",
     "update": "deno run -A -r jsr:@fresh/update ."
   },
   "lint": {
@@ -25,7 +25,10 @@
     "tailwindcss": "npm:tailwindcss@^4.1.10",
     "@fresh/plugin-tailwind": "jsr:@fresh/plugin-tailwind@^0.0.1-alpha.9",
     "@tailwindcss/postcss": "npm:@tailwindcss/postcss@^4.1.10",
-    "postcss": "npm:postcss@^8.5.6"
+    "postcss": "npm:postcss@^8.5.6",
+    "@std/crypto": "jsr:@std/crypto@^0.219.0",
+    "@std/ulid": "jsr:@std/ulid@^0.219.0",
+    "@std/encoding": "jsr:@std/encoding@^0.219.0"
   },
   "compilerOptions": {
     "lib": [
