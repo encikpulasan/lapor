@@ -51,7 +51,7 @@ export default define.page(function Home(ctx) {
                 <p>
                   Welcome back, <strong>{ctx.state.user.name}</strong>!
                 </p>
-                <form method="POST" action="/api/auth/logout" class="ml-4">
+                <form method="POST" action="/auth/logout" class="ml-4">
                   <button
                     type="submit"
                     class="bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-medium transition-colors duration-200"
@@ -116,7 +116,7 @@ export default define.page(function Home(ctx) {
                 </a>
               )}
               {ctx.state.user && (
-                <form method="POST" action="/api/auth/logout" class="inline">
+                <form method="POST" action="/auth/logout" class="inline">
                   <button
                     type="submit"
                     class="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 underline font-medium transition-colors"

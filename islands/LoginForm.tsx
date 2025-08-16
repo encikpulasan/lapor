@@ -35,8 +35,14 @@ export default function LoginForm() {
       const result = await response.json();
 
       if (result.success) {
-        // Redirect to home page
-        globalThis.location.href = "/";
+        // Check if user is admin and redirect accordingly
+        if (result.user && result.user.is_admin) {
+          // Redirect admin users to admin panel
+          globalThis.location.href = "/admin";
+        } else {
+          // Redirect regular users to home page
+          globalThis.location.href = "/";
+        }
       } else {
         error.value = result.error || "Login failed";
       }

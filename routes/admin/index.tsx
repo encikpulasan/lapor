@@ -33,7 +33,7 @@ export default define.page(function Admin(ctx) {
             <span class="text-sm text-gray-500 dark:text-gray-400">
               Welcome, {ctx.state.user.name}
             </span>
-            <form method="POST" action="/api/auth/logout">
+            <form method="POST" action="/auth/logout">
               <button
                 type="submit"
                 class="bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"

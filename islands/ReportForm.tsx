@@ -251,7 +251,7 @@ export default function ReportForm({ user }: ReportFormProps) {
         </div>
 
         {/* Info Box */}
-        <div class="bg-gray-100 dark:bg-gray-700 rounded-md p-4 transition-colors">
+        {/* <div class="bg-gray-100 dark:bg-gray-700 rounded-md p-4 transition-colors">
           <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-2">
             Automatic Data Collection
           </h3>
@@ -267,7 +267,7 @@ export default function ReportForm({ user }: ReportFormProps) {
               <li>• Report will be linked to your account: {user.email}</li>
             )}
           </ul>
-        </div>
+        </div> */}
 
         {/* Submit Button */}
         <button
