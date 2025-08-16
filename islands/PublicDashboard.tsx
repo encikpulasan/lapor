@@ -85,11 +85,11 @@ export default function PublicDashboard() {
   };
 
   const getContributionColor = (count: number) => {
-    if (count === 0) return "bg-gray-50 dark:bg-gray-900";
-    if (count <= 2) return "bg-green-200 dark:bg-green-800";
-    if (count <= 5) return "bg-green-400 dark:bg-green-700";
+    if (count === 0) return "bg-gray-200 dark:bg-gray-900";
+    if (count <= 2) return "bg-green-300 dark:bg-green-800";
+    if (count <= 5) return "bg-green-500 dark:bg-green-700";
     if (count <= 10) return "bg-green-600 dark:bg-green-600";
-    return "bg-green-800 dark:bg-green-500";
+    return "bg-green-700 dark:bg-green-500";
   };
 
   const formatHour = (hour: string) => {
@@ -245,15 +245,15 @@ export default function PublicDashboard() {
         <div class="flex items-center justify-center mt-4 text-xs text-gray-500 dark:text-gray-400 space-x-3">
           <span>Less</span>
           <div class="flex space-x-1">
-            <div class="w-4 h-4 sm:w-5 sm:h-5 bg-gray-50 dark:bg-gray-900 rounded">
+            <div class="w-4 h-4 sm:w-5 sm:h-5 bg-gray-200 dark:bg-gray-900 rounded">
             </div>
-            <div class="w-4 h-4 sm:w-5 sm:h-5 bg-green-200 dark:bg-green-800 rounded">
+            <div class="w-4 h-4 sm:w-5 sm:h-5 bg-green-300 dark:bg-green-800 rounded">
             </div>
-            <div class="w-4 h-4 sm:w-5 sm:h-5 bg-green-400 dark:bg-green-700 rounded">
+            <div class="w-4 h-4 sm:w-5 sm:h-5 bg-green-500 dark:bg-green-700 rounded">
             </div>
             <div class="w-4 h-4 sm:w-5 sm:h-5 bg-green-600 dark:bg-green-600 rounded">
             </div>
-            <div class="w-4 h-4 sm:w-5 sm:h-5 bg-green-800 dark:bg-green-500 rounded">
+            <div class="w-4 h-4 sm:w-5 sm:h-5 bg-green-700 dark:bg-green-500 rounded">
             </div>
           </div>
           <span>More</span>

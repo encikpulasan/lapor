@@ -12,7 +12,7 @@ export default define.page(function Home(ctx) {
         {/* Header */}
         <div class="text-center mb-8">
           <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Neighbourhood Pollution Reporting
+            Pollution Reporting
           </h1>
           <p class="text-lg text-gray-600 dark:text-gray-300 mb-6">
             Report pollution issues in your area. Help keep our community clean
@@ -49,9 +49,7 @@ export default define.page(function Home(ctx) {
             <div class="bg-green-100 dark:bg-green-900/20 border border-green-400 dark:border-green-500 text-green-700 dark:text-green-300 px-4 py-3 rounded mb-6">
               <div class="flex justify-between items-center">
                 <p>
-                  Welcome back,{" "}
-                  <strong>{ctx.state.user.name}</strong>! Your reports will be
-                  linked to your account for tracking.
+                  Welcome back, <strong>{ctx.state.user.name}</strong>!
                 </p>
                 <form method="POST" action="/api/auth/logout" class="ml-4">
                   <button

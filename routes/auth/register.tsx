@@ -48,7 +48,7 @@ export default define.page(function Register(ctx) {
             <div class="mt-6">
               <a
                 href="/"
-                class="w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                class="w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-blue-600 dark:bg-blue-500 text-sm font-medium text-white hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
               >
                 Continue without account (Anonymous reporting)
               </a>

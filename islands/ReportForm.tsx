@@ -1,6 +1,5 @@
 import { useSignal } from "@preact/signals";
 import { useEffect } from "preact/hooks";
-import { Button } from "../components/Button.tsx";
 import type { User } from "../lib/db.ts";
 
 interface ReportFormProps {
@@ -238,17 +237,17 @@ export default function ReportForm({ user }: ReportFormProps) {
         </div>
 
         {/* Submit Button */}
-        <Button
+        <button
           type="submit"
           disabled={isSubmitting.value}
-          class={`w-full py-3 px-6 rounded-md font-medium text-white transition-colors duration-200 ${
+          class={`w-full py-3 px-6 rounded-md font-medium transition-colors duration-200 ${
             isSubmitting.value
-              ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+              ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed text-white"
+              : "bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
           }`}
         >
           {isSubmitting.value ? "Submitting..." : "Submit Report"}
-        </Button>
+        </button>
       </form>
     </div>
   );
