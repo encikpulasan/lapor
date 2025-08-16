@@ -124,17 +124,17 @@ export default function ReportForm({ user }: ReportFormProps) {
   };
 
   return (
-    <div class="bg-white rounded-lg shadow-md p-6">
-      <h2 class="text-2xl font-semibold text-gray-900 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 transition-colors duration-200">
+      <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
         Submit Pollution Report
       </h2>
 
       {submitStatus.value.type && (
         <div
-          class={`p-4 rounded-md mb-6 ${
+          class={`p-4 rounded-md mb-6 transition-colors ${
             submitStatus.value.type === "success"
-              ? "bg-green-100 border border-green-400 text-green-700"
-              : "bg-red-100 border border-red-400 text-red-700"
+              ? "bg-green-100 dark:bg-green-900/20 border border-green-400 dark:border-green-500 text-green-700 dark:text-green-300"
+              : "bg-red-100 dark:bg-red-900/20 border border-red-400 dark:border-red-500 text-red-700 dark:text-red-300"
           }`}
         >
           {submitStatus.value.message}
@@ -146,7 +146,7 @@ export default function ReportForm({ user }: ReportFormProps) {
         <div>
           <label
             htmlFor="pollution_type"
-            class="block text-sm font-medium text-gray-700 mb-2"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
             Type of Pollution *
           </label>
@@ -155,7 +155,7 @@ export default function ReportForm({ user }: ReportFormProps) {
             value={pollutionType.value}
             onInput={(e) =>
               pollutionType.value = (e.target as HTMLSelectElement).value}
-            class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            class="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             required
           >
             <option value="">Select pollution type</option>
@@ -174,7 +174,7 @@ export default function ReportForm({ user }: ReportFormProps) {
         <div>
           <label
             htmlFor="sector"
-            class="block text-sm font-medium text-gray-700 mb-2"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
             Area Sector *
           </label>
@@ -183,7 +183,7 @@ export default function ReportForm({ user }: ReportFormProps) {
             value={sector.value}
             onInput={(e) =>
               sector.value = (e.target as HTMLSelectElement).value}
-            class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            class="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             required
           >
             <option value="">Select your sector</option>
@@ -193,7 +193,7 @@ export default function ReportForm({ user }: ReportFormProps) {
             <option value="4">Sector 4</option>
             <option value="5">Sector 5</option>
           </select>
-          <p class="mt-1 text-sm text-gray-500">
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
             Select the sector/area where the pollution is occurring
           </p>
         </div>
@@ -202,7 +202,7 @@ export default function ReportForm({ user }: ReportFormProps) {
         <div>
           <label
             htmlFor="description"
-            class="block text-sm font-medium text-gray-700 mb-2"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
             Description (Optional)
           </label>
@@ -212,18 +212,18 @@ export default function ReportForm({ user }: ReportFormProps) {
             onInput={(e) =>
               description.value = (e.target as HTMLTextAreaElement).value}
             rows={4}
-            class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            class="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             placeholder="Provide additional details about the pollution incident..."
           >
           </textarea>
         </div>
 
         {/* Info Box */}
-        <div class="bg-gray-100 rounded-md p-4">
-          <h3 class="text-sm font-medium text-gray-900 mb-2">
+        <div class="bg-gray-100 dark:bg-gray-700 rounded-md p-4 transition-colors">
+          <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-2">
             Automatic Data Collection
           </h3>
-          <ul class="text-sm text-gray-600 space-y-1">
+          <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-1">
             <li>
               • Your approximate location will be detected from your IP address
             </li>
@@ -241,10 +241,10 @@ export default function ReportForm({ user }: ReportFormProps) {
         <Button
           type="submit"
           disabled={isSubmitting.value}
-          class={`w-full py-3 px-6 rounded-md font-medium text-white transition-colors ${
+          class={`w-full py-3 px-6 rounded-md font-medium text-white transition-colors duration-200 ${
             isSubmitting.value
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
+              ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
           }`}
         >
           {isSubmitting.value ? "Submitting..." : "Submit Report"}

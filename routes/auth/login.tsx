@@ -13,17 +13,17 @@ export default define.page(function Login(ctx) {
   }
 
   return (
-    <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8 transition-colors duration-200">
       <div class="sm:mx-auto sm:w-full sm:max-w-md">
         <div class="text-center">
-          <h2 class="text-3xl font-extrabold text-gray-900">
+          <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white">
             Sign in to your account
           </h2>
-          <p class="mt-2 text-sm text-gray-600">
+          <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
             Or{" "}
             <a
               href="/auth/register"
-              class="font-medium text-blue-600 hover:text-blue-500"
+              class="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
             >
               create a new account
             </a>
@@ -32,7 +32,7 @@ export default define.page(function Login(ctx) {
       </div>
 
       <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+        <div class="bg-white dark:bg-gray-800 py-8 px-4 shadow sm:rounded-lg sm:px-10 transition-colors duration-200">
           <LoginForm />
 
           <div class="mt-6">
@@ -48,7 +48,7 @@ export default define.page(function Login(ctx) {
             <div class="mt-6">
               <a
                 href="/"
-                class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                class="w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
               >
                 Continue without account (Anonymous reporting)
               </a>

@@ -17,24 +17,26 @@ export default define.page(function Admin(ctx) {
   }
 
   return (
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       <div class="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div class="flex justify-between items-center mb-8">
           <div>
-            <h1 class="text-3xl font-bold text-gray-900">Admin Panel</h1>
-            <p class="text-gray-600">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+              Admin Panel
+            </h1>
+            <p class="text-gray-600 dark:text-gray-300">
               Manage pollution reports and user accounts
             </p>
           </div>
           <div class="flex items-center space-x-4">
-            <span class="text-sm text-gray-500">
+            <span class="text-sm text-gray-500 dark:text-gray-400">
               Welcome, {ctx.state.user.name}
             </span>
             <form method="POST" action="/api/auth/logout">
               <button
                 type="submit"
-                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                class="bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Logout
               </button>
@@ -43,24 +45,24 @@ export default define.page(function Admin(ctx) {
         </div>
 
         {/* Navigation */}
-        <div class="bg-white shadow rounded-lg mb-8">
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-8 transition-colors duration-200">
           <div class="px-6 py-4">
             <nav class="flex space-x-8">
               <a
                 href="/admin"
-                class="text-blue-600 hover:text-blue-800 font-medium border-b-2 border-blue-600 pb-2"
+                class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium border-b-2 border-blue-600 dark:border-blue-400 pb-2 transition-colors"
               >
                 Reports Dashboard
               </a>
               <a
                 href="/admin/users"
-                class="text-gray-500 hover:text-gray-700 font-medium pb-2"
+                class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 font-medium pb-2 transition-colors"
               >
                 User Management
               </a>
               <a
                 href="/admin/settings"
-                class="text-gray-500 hover:text-gray-700 font-medium pb-2"
+                class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 font-medium pb-2 transition-colors"
               >
                 Settings
               </a>
