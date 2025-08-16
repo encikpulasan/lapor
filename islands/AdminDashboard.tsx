@@ -1,7 +1,12 @@
 import { useSignal } from "@preact/signals";
 import { useEffect } from "preact/hooks";
 import { Button } from "../components/Button.tsx";
-import type { PollutionReport, User } from "../lib/db.ts";
+import type {
+  PollutionReport,
+  PollutionType,
+  Sector,
+  User,
+} from "../lib/db.ts";
 
 interface AdminDashboardProps {
   user: User;
@@ -17,22 +22,77 @@ export default function AdminDashboard({ user: _user }: AdminDashboardProps) {
   const editingReport = useSignal<PollutionReport | null>(null);
   const showEditModal = useSignal(false);
 
+  // Dynamic data for filters and display
+  const pollutionTypes = useSignal<PollutionType[]>([]);
+  const sectors = useSignal<Sector[]>([]);
+  const formDataLoading = useSignal(true);
+
   // Load reports on component mount
   useEffect(() => {
-    loadReports();
+    const initializeData = async () => {
+      try {
+        await loadFormData();
+        await loadReports();
+      } catch (err) {
+        console.error("Initialization error:", err);
+        error.value = "Failed to initialize dashboard";
+        loading.value = false;
+      }
+    };
+
+    initializeData();
   }, []);
+
+  const loadFormData = async () => {
+    try {
+      console.log("Loading form data...");
+      const response = await fetch("/api/form-data");
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log("Form data response:", result);
+
+      if (result.success) {
+        pollutionTypes.value = result.data.pollution_types;
+        sectors.value = result.data.sectors;
+        console.log("Form data loaded successfully:", {
+          types: pollutionTypes.value.length,
+          sectors: sectors.value.length,
+        });
+      } else {
+        throw new Error(result.error || "Failed to load form data");
+      }
+    } catch (err) {
+      console.error("Load form data error:", err);
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      error.value = `Failed to load form data: ${errorMessage}`;
+      throw err; // Re-throw to be caught by the caller
+    } finally {
+      formDataLoading.value = false;
+    }
+  };
 
   const loadReports = async () => {
     loading.value = true;
     error.value = "";
 
     try {
+      console.log("Loading reports...");
       const params = new URLSearchParams();
       if (filterSector.value) params.append("sector", filterSector.value);
       if (filterUserId.value) params.append("user_id", filterUserId.value);
 
       const response = await fetch(`/api/reports?${params.toString()}`);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
       const result = await response.json();
+      console.log("Reports response:", result);
 
       if (result.success) {
         let filteredReports = result.reports;
@@ -46,12 +106,14 @@ export default function AdminDashboard({ user: _user }: AdminDashboardProps) {
         }
 
         reports.value = filteredReports;
+        console.log("Reports loaded successfully:", filteredReports.length);
       } else {
-        error.value = result.error || "Failed to load reports";
+        throw new Error(result.error || "Failed to load reports");
       }
     } catch (err) {
       console.error("Load reports error:", err);
-      error.value = "Network error. Please try again.";
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      error.value = `Failed to load reports: ${errorMessage}`;
     } finally {
       loading.value = false;
     }
@@ -64,8 +126,8 @@ export default function AdminDashboard({ user: _user }: AdminDashboardProps) {
         [
           report.report_id,
           report.timestamp,
-          report.pollution_type,
-          report.sector,
+          getPollutionTypeDisplayName(report.pollution_type),
+          getSectorDisplayName(report.sector),
           report.ip_address,
           report.location
             ? `"${report.location.city} (${report.location.lat}, ${report.location.lon})"`
@@ -93,6 +155,19 @@ export default function AdminDashboard({ user: _user }: AdminDashboardProps) {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString();
+  };
+
+  const getPollutionTypeDisplayName = (typeSlug: string) => {
+    const type = pollutionTypes.value.find((t) =>
+      t.name.toLowerCase().replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "") ===
+        typeSlug
+    );
+    return type ? type.name : typeSlug;
+  };
+
+  const getSectorDisplayName = (sectorIndex: number) => {
+    const sector = sectors.value[sectorIndex - 1];
+    return sector ? sector.name : `Sector ${sectorIndex}`;
   };
 
   const getStatusBadgeClass = (status: string) => {
@@ -179,7 +254,7 @@ export default function AdminDashboard({ user: _user }: AdminDashboardProps) {
     }
   };
 
-  if (loading.value) {
+  if (loading.value && !error.value) {
     return (
       <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-8 transition-colors duration-200">
         <div class="text-center">
@@ -241,13 +316,17 @@ export default function AdminDashboard({ user: _user }: AdminDashboardProps) {
               loadReports();
             }}
             class="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            disabled={formDataLoading.value}
           >
             <option value="">All Sectors</option>
-            <option value="1">Sector 1</option>
-            <option value="2">Sector 2</option>
-            <option value="3">Sector 3</option>
-            <option value="4">Sector 4</option>
-            <option value="5">Sector 5</option>
+            {sectors.value.map((sector) => (
+              <option
+                key={sector.sector_id}
+                value={sectors.value.indexOf(sector) + 1}
+              >
+                {sector.name}
+              </option>
+            ))}
           </select>
 
           <select
@@ -257,16 +336,20 @@ export default function AdminDashboard({ user: _user }: AdminDashboardProps) {
               loadReports();
             }}
             class="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            disabled={formDataLoading.value}
           >
             <option value="">All Types</option>
-            <option value="smell">Smell</option>
-            <option value="smoke">Smoke</option>
-            <option value="noise">Noise</option>
-            <option value="water">Water</option>
-            <option value="air">Air</option>
-            <option value="waste">Waste</option>
-            <option value="chemical">Chemical</option>
-            <option value="other">Other</option>
+            {pollutionTypes.value.map((type) => (
+              <option
+                key={type.type_id}
+                value={type.name.toLowerCase().replace(/\s+/g, "_").replace(
+                  /[^a-z0-9_]/g,
+                  "",
+                )}
+              >
+                {type.name}
+              </option>
+            ))}
           </select>
 
           <Button
@@ -286,7 +369,30 @@ export default function AdminDashboard({ user: _user }: AdminDashboardProps) {
 
         {error.value && (
           <div class="bg-red-100 dark:bg-red-900/20 border border-red-400 dark:border-red-500 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4 transition-colors">
-            {error.value}
+            <div class="flex items-center justify-between">
+              <span>{error.value}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  error.value = "";
+                  loading.value = true;
+                  const initializeData = async () => {
+                    try {
+                      await loadFormData();
+                      await loadReports();
+                    } catch (err) {
+                      console.error("Retry initialization error:", err);
+                      error.value = "Failed to initialize dashboard";
+                      loading.value = false;
+                    }
+                  };
+                  initializeData();
+                }}
+                class="ml-4 px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors"
+              >
+                Retry
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -349,10 +455,12 @@ export default function AdminDashboard({ user: _user }: AdminDashboardProps) {
                         {formatDate(report.timestamp)}
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                        <span class="capitalize">{report.pollution_type}</span>
+                        <span class="capitalize">
+                          {getPollutionTypeDisplayName(report.pollution_type)}
+                        </span>
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                        {report.sector}
+                        {getSectorDisplayName(report.sector)}
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                         {report.location ? report.location.city : "Unknown"}

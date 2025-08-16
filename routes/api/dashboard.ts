@@ -1,5 +1,5 @@
 import { define } from "../../utils.ts";
-import { ReportDB } from "../../lib/db.ts";
+import { PollutionTypeDB, ReportDB, SectorDB } from "../../lib/db.ts";
 
 export const handler = define.handlers({
   async GET(ctx) {
@@ -71,40 +71,124 @@ export const handler = define.handlers({
         }
       });
 
+      // Get dynamic pollution types and sectors
+      const [pollutionTypes, sectors] = await Promise.all([
+        PollutionTypeDB.getActive(),
+        SectorDB.getActive(),
+      ]);
+
+      // Debug logging
+      console.log(
+        "Dashboard API - Active pollution types:",
+        pollutionTypes.map((t) => t.name),
+      );
+      console.log(
+        "Dashboard API - Active sectors:",
+        sectors.map((s) => s.name),
+      );
+      console.log("Dashboard API - Total reports:", allReports.length);
+
       // Calculate report type distribution
       const typeData: { [type: string]: number } = {};
-      const typeLabels = [
-        "smell",
-        "smoke",
-        "noise",
-        "water",
-        "air",
-        "waste",
-        "chemical",
-        "other",
-      ];
 
       // Initialize all types with 0
-      typeLabels.forEach((type) => {
-        typeData[type] = 0;
+      pollutionTypes.forEach((type) => {
+        typeData[type.name] = 0;
       });
+
+      // Create a comprehensive mapping for legacy data
+      const legacyTypeMapping: { [key: string]: string } = {
+        "smell": "Bad Smell / Odor",
+        "smoke": "Smoke",
+        "noise": "Noise Pollution",
+        "water": "Water Pollution",
+        "air": "Air Pollution",
+        "waste": "Waste / Litter",
+        "chemical": "Chemical Pollution",
+        "other": "Other",
+      };
 
       // Count reports by type
       allReports.forEach((report) => {
-        const type = report.pollution_type || "other";
-        typeData[type] = (typeData[type] || 0) + 1;
+        const reportType = report.pollution_type || "other";
+
+        // Try to find the type in our dynamic types first
+        let finalTypeName = pollutionTypes.find((t) =>
+          t.name.toLowerCase().replace(/\s+/g, "_").replace(
+            /[^a-z0-9_]/g,
+            "",
+          ) === reportType
+        )?.name;
+
+        // If not found, try legacy mapping
+        if (!finalTypeName) {
+          finalTypeName = legacyTypeMapping[reportType];
+        }
+
+        // If still not found, use the original type
+        if (!finalTypeName) {
+          finalTypeName = reportType;
+        }
+
+        // Add to the appropriate category
+        if (typeData[finalTypeName] !== undefined) {
+          typeData[finalTypeName]++;
+        } else {
+          // If the type doesn't exist in our current types, add it to "Other"
+          if (typeData["Other"] !== undefined) {
+            typeData["Other"]++;
+          }
+        }
       });
+
+      console.log("Dashboard API - Final type data:", typeData);
 
       // Calculate sector distribution
       const sectorData: { [sector: string]: number } = {};
-      for (let s = 1; s <= 5; s++) {
-        sectorData[s.toString()] = 0;
-      }
+
+      // Initialize all sectors with 0
+      sectors.forEach((sector) => {
+        sectorData[sector.name] = 0;
+      });
+
+      // Create a mapping for legacy sector data
+      const legacySectorMapping: { [key: number]: string } = {
+        1: "Sector 1",
+        2: "Sector 2",
+        3: "Sector 3",
+        4: "Sector 4",
+        5: "Sector 5",
+      };
 
       allReports.forEach((report) => {
-        const sector = report.sector?.toString() || "1";
-        sectorData[sector] = (sectorData[sector] || 0) + 1;
+        const sectorIndex = report.sector || 1;
+
+        // Try to find the sector in our dynamic sectors first
+        let sectorName = sectors[sectorIndex - 1]?.name;
+
+        // If not found, try legacy mapping
+        if (!sectorName) {
+          sectorName = legacySectorMapping[sectorIndex];
+        }
+
+        // If still not found, create a generic name
+        if (!sectorName) {
+          sectorName = `Sector ${sectorIndex}`;
+        }
+
+        // Add to the appropriate category
+        if (sectorData[sectorName] !== undefined) {
+          sectorData[sectorName]++;
+        } else {
+          // If the sector doesn't exist in our current sectors, add it to the first available
+          const firstSector = sectors[0]?.name || "Sector 1";
+          if (sectorData[firstSector] !== undefined) {
+            sectorData[firstSector]++;
+          }
+        }
       });
+
+      console.log("Dashboard API - Final sector data:", sectorData);
 
       // Calculate summary statistics
       const today = new Date();

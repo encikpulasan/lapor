@@ -64,6 +64,12 @@ export default define.page(function AdminSettingsPage(ctx) {
                 User Management
               </a>
               <a
+                href="/admin/sector-type-management"
+                class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 font-medium pb-2 transition-colors"
+              >
+                Sector & Type Management
+              </a>
+              <a
                 href="/admin/settings"
                 class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium border-b-2 border-blue-600 dark:border-blue-400 pb-2 transition-colors"
               >

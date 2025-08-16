@@ -1,23 +1,13 @@
 import { define } from "../../utils.ts";
-import { type PollutionReport, ReportDB } from "../../lib/db.ts";
+import {
+  type PollutionReport,
+  PollutionTypeDB,
+  ReportDB,
+  SectorDB,
+} from "../../lib/db.ts";
 import { LocationService } from "../../lib/location.ts";
 import { DeviceService } from "../../lib/device.ts";
 import { AuthService } from "../../lib/auth.ts";
-
-// Pollution types based on SRS requirements
-const VALID_POLLUTION_TYPES = [
-  "smell",
-  "smoke",
-  "noise",
-  "water",
-  "air",
-  "waste",
-  "chemical",
-  "other",
-];
-
-// Sectors 1-5 as per SRS requirements
-const VALID_SECTORS = [1, 2, 3, 4, 5];
 
 export const handler = define.handlers({
   // Submit pollution report
@@ -31,17 +21,33 @@ export const handler = define.handlers({
         description,
       } = body;
 
+      // Get active pollution types and sectors for validation
+      const [activeTypes, activeSectors] = await Promise.all([
+        PollutionTypeDB.getActive(),
+        SectorDB.getActive(),
+      ]);
+
+      // Create validation mappings
+      const validTypeSlugs = activeTypes.map((type) =>
+        type.name.toLowerCase().replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "")
+      );
+      const validSectorIndices = activeSectors.map((_, index) => index + 1);
+
       // Validation
-      if (!pollution_type || !VALID_POLLUTION_TYPES.includes(pollution_type)) {
+      if (!pollution_type || !validTypeSlugs.includes(pollution_type)) {
+        console.log("Validation failed - pollution_type:", pollution_type);
+        console.log("Valid types:", validTypeSlugs);
         return new Response(
           JSON.stringify({ error: "Invalid pollution type" }),
           { status: 400, headers: { "Content-Type": "application/json" } },
         );
       }
 
-      if (!sector || !VALID_SECTORS.includes(parseInt(sector))) {
+      if (!sector || !validSectorIndices.includes(parseInt(sector))) {
+        console.log("Validation failed - sector:", sector);
+        console.log("Valid sectors:", validSectorIndices);
         return new Response(
-          JSON.stringify({ error: "Invalid sector (must be 1-5)" }),
+          JSON.stringify({ error: "Invalid sector" }),
           { status: 400, headers: { "Content-Type": "application/json" } },
         );
       }

@@ -44,6 +44,24 @@ export interface Session {
   expires_at: Date;
 }
 
+export interface PollutionType {
+  type_id: string;
+  name: string;
+  description?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Sector {
+  sector_id: string;
+  name: string;
+  description?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 // Database operations for reports
 export class ReportDB {
   static async create(
@@ -245,6 +263,146 @@ export class SessionDB {
 
   static async delete(sessionId: string): Promise<void> {
     await kv.delete(["sessions", sessionId]);
+  }
+}
+
+// Database operations for pollution types
+export class PollutionTypeDB {
+  static async create(
+    type: Omit<PollutionType, "type_id" | "created_at" | "updated_at">,
+  ): Promise<PollutionType> {
+    const type_id = ulid();
+    const now = new Date().toISOString();
+
+    const newType: PollutionType = {
+      type_id,
+      ...type,
+      created_at: now,
+      updated_at: now,
+    };
+
+    await kv.set(["pollution_types", type_id], newType);
+    return newType;
+  }
+
+  static async getAll(): Promise<PollutionType[]> {
+    const entries = kv.list<PollutionType>({ prefix: ["pollution_types"] });
+    const types: PollutionType[] = [];
+
+    for await (const entry of entries) {
+      types.push(entry.value);
+    }
+
+    return types.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  static async getActive(): Promise<PollutionType[]> {
+    const allTypes = await this.getAll();
+    return allTypes.filter((type) => type.is_active);
+  }
+
+  static async getById(typeId: string): Promise<PollutionType | null> {
+    const result = await kv.get<PollutionType>(["pollution_types", typeId]);
+    return result.value;
+  }
+
+  static async update(
+    typeId: string,
+    updates: Partial<Omit<PollutionType, "type_id" | "created_at">>,
+  ): Promise<PollutionType | null> {
+    const existing = await this.getById(typeId);
+    if (!existing) return null;
+
+    const updated: PollutionType = {
+      ...existing,
+      ...updates,
+      updated_at: new Date().toISOString(),
+    };
+
+    await kv.set(["pollution_types", typeId], updated);
+    return updated;
+  }
+
+  static async delete(typeId: string): Promise<boolean> {
+    const existing = await this.getById(typeId);
+    if (!existing) return false;
+
+    await kv.delete(["pollution_types", typeId]);
+    return true;
+  }
+
+  static get kv() {
+    return kv;
+  }
+}
+
+// Database operations for sectors
+export class SectorDB {
+  static async create(
+    sector: Omit<Sector, "sector_id" | "created_at" | "updated_at">,
+  ): Promise<Sector> {
+    const sector_id = ulid();
+    const now = new Date().toISOString();
+
+    const newSector: Sector = {
+      sector_id,
+      ...sector,
+      created_at: now,
+      updated_at: now,
+    };
+
+    await kv.set(["sectors", sector_id], newSector);
+    return newSector;
+  }
+
+  static async getAll(): Promise<Sector[]> {
+    const entries = kv.list<Sector>({ prefix: ["sectors"] });
+    const sectors: Sector[] = [];
+
+    for await (const entry of entries) {
+      sectors.push(entry.value);
+    }
+
+    return sectors.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  static async getActive(): Promise<Sector[]> {
+    const allSectors = await this.getAll();
+    return allSectors.filter((sector) => sector.is_active);
+  }
+
+  static async getById(sectorId: string): Promise<Sector | null> {
+    const result = await kv.get<Sector>(["sectors", sectorId]);
+    return result.value;
+  }
+
+  static async update(
+    sectorId: string,
+    updates: Partial<Omit<Sector, "sector_id" | "created_at">>,
+  ): Promise<Sector | null> {
+    const existing = await this.getById(sectorId);
+    if (!existing) return null;
+
+    const updated: Sector = {
+      ...existing,
+      ...updates,
+      updated_at: new Date().toISOString(),
+    };
+
+    await kv.set(["sectors", sectorId], updated);
+    return updated;
+  }
+
+  static async delete(sectorId: string): Promise<boolean> {
+    const existing = await this.getById(sectorId);
+    if (!existing) return false;
+
+    await kv.delete(["sectors", sectorId]);
+    return true;
+  }
+
+  static get kv() {
+    return kv;
   }
 }
 

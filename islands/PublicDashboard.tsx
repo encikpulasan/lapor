@@ -66,6 +66,9 @@ export default function PublicDashboard() {
       const result = await response.json();
 
       if (result.success) {
+        console.log("PublicDashboard - Received data:", result.data);
+        console.log("PublicDashboard - Types data:", result.data.types);
+        console.log("PublicDashboard - Sectors data:", result.data.sectors);
         data.value = result.data;
         selectedDate.value = result.data.selectedDate;
       } else {
@@ -307,15 +310,20 @@ export default function PublicDashboard() {
   const renderTypeChart = () => {
     if (!data.value) return null;
 
-    const types = [
-      { key: "smell", label: "Smell", color: "bg-yellow-500" },
-      { key: "smoke", label: "Smoke", color: "bg-gray-600" },
-      { key: "noise", label: "Noise", color: "bg-purple-500" },
-      { key: "water", label: "Water", color: "bg-blue-500" },
-      { key: "air", label: "Air", color: "bg-cyan-500" },
-      { key: "waste", label: "Waste", color: "bg-green-600" },
-      { key: "chemical", label: "Chemical", color: "bg-red-500" },
-      { key: "other", label: "Other", color: "bg-gray-400" },
+    // Generate colors for dynamic types
+    const colors = [
+      "bg-yellow-500",
+      "bg-gray-600",
+      "bg-purple-500",
+      "bg-blue-500",
+      "bg-cyan-500",
+      "bg-green-600",
+      "bg-red-500",
+      "bg-orange-500",
+      "bg-pink-500",
+      "bg-indigo-500",
+      "bg-teal-500",
+      "bg-lime-500",
     ];
 
     const totalTypes = Object.values(data.value.types).reduce(
@@ -330,22 +338,22 @@ export default function PublicDashboard() {
         </h3>
 
         <div class="space-y-3">
-          {types.map((type) => {
-            const count = data.value!.types[type.key] || 0;
+          {Object.entries(data.value.types).map(([typeName, count], index) => {
             const percentage = totalTypes > 0 ? (count / totalTypes) * 100 : 0;
+            const color = colors[index % colors.length];
 
             return (
-              <div key={type.key} class="flex items-center justify-between">
+              <div key={typeName} class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                  <div class={`w-3 h-3 rounded-full ${type.color}`} />
+                  <div class={`w-3 h-3 rounded-full ${color}`} />
                   <span class="text-sm text-gray-700 dark:text-gray-300">
-                    {type.label}
+                    {typeName}
                   </span>
                 </div>
                 <div class="flex items-center space-x-2">
                   <div class="w-24 bg-gray-100 dark:bg-gray-700 rounded-full h-2">
                     <div
-                      class={`h-2 rounded-full ${type.color}`}
+                      class={`h-2 rounded-full ${color}`}
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
@@ -364,12 +372,18 @@ export default function PublicDashboard() {
   const renderSectorChart = () => {
     if (!data.value) return null;
 
-    const sectors = [
-      { key: "1", label: "Sector 1", color: "bg-blue-500" },
-      { key: "2", label: "Sector 2", color: "bg-green-500" },
-      { key: "3", label: "Sector 3", color: "bg-purple-500" },
-      { key: "4", label: "Sector 4", color: "bg-orange-500" },
-      { key: "5", label: "Sector 5", color: "bg-red-500" },
+    // Generate colors for dynamic sectors
+    const sectorColors = [
+      "bg-blue-500",
+      "bg-green-500",
+      "bg-purple-500",
+      "bg-orange-500",
+      "bg-red-500",
+      "bg-pink-500",
+      "bg-indigo-500",
+      "bg-teal-500",
+      "bg-lime-500",
+      "bg-amber-500",
     ];
 
     const totalSectors = Object.values(data.value.sectors).reduce(
@@ -384,34 +398,36 @@ export default function PublicDashboard() {
         </h3>
 
         <div class="space-y-3">
-          {sectors.map((sector) => {
-            const count = data.value!.sectors[sector.key] || 0;
-            const percentage = totalSectors > 0
-              ? (count / totalSectors) * 100
-              : 0;
+          {Object.entries(data.value.sectors).map(
+            ([sectorName, count], index) => {
+              const percentage = totalSectors > 0
+                ? (count / totalSectors) * 100
+                : 0;
+              const color = sectorColors[index % sectorColors.length];
 
-            return (
-              <div key={sector.key} class="flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                  <div class={`w-3 h-3 rounded-full ${sector.color}`} />
-                  <span class="text-sm text-gray-700 dark:text-gray-300">
-                    {sector.label}
-                  </span>
-                </div>
-                <div class="flex items-center space-x-2">
-                  <div class="w-24 bg-gray-100 dark:bg-gray-700 rounded-full h-2">
-                    <div
-                      class={`h-2 rounded-full ${sector.color}`}
-                      style={{ width: `${percentage}%` }}
-                    />
+              return (
+                <div key={sectorName} class="flex items-center justify-between">
+                  <div class="flex items-center space-x-3">
+                    <div class={`w-3 h-3 rounded-full ${color}`} />
+                    <span class="text-sm text-gray-700 dark:text-gray-300">
+                      {sectorName}
+                    </span>
                   </div>
-                  <span class="text-xs text-gray-500 dark:text-gray-400 w-8 text-right">
-                    {count}
-                  </span>
+                  <div class="flex items-center space-x-2">
+                    <div class="w-24 bg-gray-100 dark:bg-gray-700 rounded-full h-2">
+                      <div
+                        class={`h-2 rounded-full ${color}`}
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                    <span class="text-xs text-gray-500 dark:text-gray-400 w-8 text-right">
+                      {count}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            },
+          )}
         </div>
       </div>
     );

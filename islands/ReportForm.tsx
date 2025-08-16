@@ -1,6 +1,6 @@
 import { useSignal } from "@preact/signals";
 import { useEffect } from "preact/hooks";
-import type { User } from "../lib/db.ts";
+import type { PollutionType, Sector, User } from "../lib/db.ts";
 
 interface ReportFormProps {
   user?: User | null;
@@ -12,10 +12,31 @@ export default function ReportForm({ user }: ReportFormProps) {
   const description = useSignal("");
   const isSubmitting = useSignal(false);
   const deviceId = useSignal("");
+  const pollutionTypes = useSignal<PollutionType[]>([]);
+  const sectors = useSignal<Sector[]>([]);
+  const formDataLoading = useSignal(true);
   const submitStatus = useSignal<{
     type: "success" | "error" | null;
     message: string;
   }>({ type: null, message: "" });
+
+  // Load form data (pollution types and sectors)
+  const loadFormData = async () => {
+    try {
+      const response = await fetch("/api/form-data");
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          pollutionTypes.value = data.data.pollution_types || [];
+          sectors.value = data.data.sectors || [];
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load form data:", error);
+    } finally {
+      formDataLoading.value = false;
+    }
+  };
 
   // Device fingerprinting on component mount
   useEffect(() => {
@@ -60,6 +81,9 @@ export default function ReportForm({ user }: ReportFormProps) {
     } else {
       generateDeviceId();
     }
+
+    // Load form data
+    loadFormData();
   }, []);
 
   const handleSubmit = async (e: Event) => {
@@ -156,16 +180,22 @@ export default function ReportForm({ user }: ReportFormProps) {
               pollutionType.value = (e.target as HTMLSelectElement).value}
             class="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             required
+            disabled={formDataLoading.value}
           >
-            <option value="">Select pollution type</option>
-            <option value="smell">Bad Smell / Odor</option>
-            <option value="smoke">Smoke</option>
-            <option value="noise">Noise Pollution</option>
-            <option value="water">Water Pollution</option>
-            <option value="air">Air Pollution</option>
-            <option value="waste">Waste / Litter</option>
-            <option value="chemical">Chemical Pollution</option>
-            <option value="other">Other</option>
+            <option value="">
+              {formDataLoading.value ? "Loading..." : "Select pollution type"}
+            </option>
+            {pollutionTypes.value.map((type) => (
+              <option
+                key={type.type_id}
+                value={type.name.toLowerCase().replace(/\s+/g, "_").replace(
+                  /[^a-z0-9_]/g,
+                  "",
+                )}
+              >
+                {type.name}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -184,13 +214,16 @@ export default function ReportForm({ user }: ReportFormProps) {
               sector.value = (e.target as HTMLSelectElement).value}
             class="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             required
+            disabled={formDataLoading.value}
           >
-            <option value="">Select your sector</option>
-            <option value="1">Sector 1</option>
-            <option value="2">Sector 2</option>
-            <option value="3">Sector 3</option>
-            <option value="4">Sector 4</option>
-            <option value="5">Sector 5</option>
+            <option value="">
+              {formDataLoading.value ? "Loading..." : "Select your sector"}
+            </option>
+            {sectors.value.map((sectorItem, index) => (
+              <option key={sectorItem.sector_id} value={index + 1}>
+                {sectorItem.name}
+              </option>
+            ))}
           </select>
           <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
             Select the sector/area where the pollution is occurring

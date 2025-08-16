@@ -1,6 +1,7 @@
 /// <reference lib="deno.unstable" />
 import { UserDB } from "./db.ts";
 import { AuthService } from "./auth.ts";
+import { seedDefaultData } from "./seed-data.ts";
 
 // Server setup and initialization functions
 export class ServerSetup {
@@ -127,6 +128,7 @@ export class ServerSetup {
 
     try {
       await this.ensureAdminAccount();
+      await seedDefaultData();
       console.log("✅ Server setup completed successfully");
     } catch (error) {
       console.error("❌ Server setup failed:", error);
