@@ -20,10 +20,10 @@ export interface PollutionReport {
   pollution_type: string;
   sector: number;
   user_id: string | null;
-  status: "pending" | "submitted" | "failed";
+  status: "pending" | "submitted" | "failed" | "resolved";
   description?: string | null;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface User {
@@ -32,8 +32,8 @@ export interface User {
   password_hash: string;
   name: string;
   phone?: string;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at: string;
   is_admin: boolean;
 }
 
@@ -49,7 +49,7 @@ export class ReportDB {
   static async create(
     report: Omit<PollutionReport, "report_id" | "created_at" | "updated_at">,
   ): Promise<PollutionReport> {
-    const now = new Date();
+    const now = new Date().toISOString();
     const fullReport: PollutionReport = {
       ...report,
       report_id: ulid(),
@@ -149,13 +149,21 @@ export class ReportDB {
     const updated: PollutionReport = {
       ...existing,
       ...updates,
-      updated_at: new Date(),
+      updated_at: new Date().toISOString(),
     };
 
     const key = ["reports", reportId];
     await kv.set(key, updated);
 
     return updated;
+  }
+
+  static get kv() {
+    return kv;
+  }
+
+  static get(reportId: string): Promise<PollutionReport | null> {
+    return this.getById(reportId);
   }
 }
 
@@ -164,7 +172,7 @@ export class UserDB {
   static async create(
     user: Omit<User, "user_id" | "created_at" | "updated_at">,
   ): Promise<User> {
-    const now = new Date();
+    const now = new Date().toISOString();
     const fullUser: User = {
       ...user,
       user_id: ulid(),
@@ -191,6 +199,14 @@ export class UserDB {
     if (!userIdResult.value) return null;
 
     return this.getById(userIdResult.value);
+  }
+
+  static get kv() {
+    return kv;
+  }
+
+  static get(userId: string): Promise<User | null> {
+    return this.getById(userId);
   }
 }
 
